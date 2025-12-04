@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GXO Logistics | Dashboard v11.0 AutoLoad</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        /* ESTILOS IDÉNTICOS A V10.0 (Estables) */
+        :root {
+            --gxo-red: #E30613; --gxo-dark: #2c3e50; --bg-body: #f8f9fa; --bg-card: #ffffff;
+            --text-main: #000000; --text-muted: #6c757d; --border-color: #dee2e6;
+            --cat-best: #a5d6a7; --cat-normal: #ffe082; --cat-worst: #ef9a9a;
+            --chart-bar: #ffab91; --chart-target: #37474f; --chart-trend-stroke: #37474f; --chart-fill-user: rgba(227, 6, 19, 0.1);
+        }
+        body.dark-mode {
+            --bg-body: #121212; --bg-card: #1e1e1e; --text-main: #e0e0e0; --text-muted: #ced4da;
+            --border-color: #333333; --chart-target: #ffffff; --chart-trend-stroke: #E30613; 
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
+        .navbar { background: var(--bg-card); box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 1px solid var(--border-color); padding: 0.8rem 1rem; }
+        .navbar-brand img { height: 40px; transition: height 0.3s; }
+        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 1rem; }
+        .card-header { background: var(--bg-card); border-bottom: 1px solid var(--border-color); font-weight: 700; color: var(--text-main); }
+        .kpi-value { font-size: 1.8rem; font-weight: 700; color: var(--text-main); word-break: break-all; } body.dark-mode .kpi-value { color: #E30613; }
+        .kpi-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+        .nav-tabs { border-bottom: 1px solid var(--border-color); flex-wrap: nowrap; overflow-x: auto; }
+        .nav-tabs .nav-link { color: var(--text-muted); border: none; font-weight: 600; white-space: nowrap; }
+        .nav-tabs .nav-link.active { color: var(--gxo-red) !important; border-bottom: 3px solid var(--gxo-red); background: transparent; }
+        .form-control, .form-select, .choices__inner { background-color: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; }
+        .choices__input { color: var(--text-main); }
+        .table { --bs-table-bg: transparent; --bs-table-color: var(--text-main); white-space: nowrap; }
+        .table thead th { background-color: var(--bg-body); color: var(--text-muted); border-bottom: 2px solid var(--border-color); }
+        body.dark-mode .table thead th { color: #fff; background-color: #2d2d2d; }
+        .table tbody td { border-bottom: 1px solid var(--border-color); }
+        .text-best { color: #1b5e20; } body.dark-mode .text-best { color: #69f0ae; }
+        .text-normal { color: #f57f17; } body.dark-mode .text-normal { color: #ffe082; }
+        .text-worst { color: #b71c1c; } body.dark-mode .text-worst { color: #ff8a80; }
+        .eff-val { font-weight: 900; font-size: 1.1em; }
+        .badge-gxo { border-radius: 50rem; padding: 0.4em 1em; font-weight: 800; font-size: 0.75em; color: #212529 !important; min-width: 80px; display: inline-block; text-align: center; }
+        .bg-best { background-color: var(--cat-best) !important; } .bg-normal { background-color: var(--cat-normal) !important; } .bg-worst { background-color: var(--cat-worst) !important; }
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.95); z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        body.dark-mode #loader { background: rgba(0,0,0,0.95); }
+        .btn-lantern { background: none; border: 1px solid var(--border-color); color: var(--text-main); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.3s; flex-shrink: 0; }
+        .btn-lantern:hover, .btn-lantern.active { background-color: var(--gxo-red); color: white; border-color: var(--gxo-red); box-shadow: 0 0 15px var(--gxo-red); }
+        .text-gxo { color: var(--gxo-red) !important; } .text-label-dark { color: var(--text-muted); } body.dark-mode .text-label-dark { color: #e0e0e0; }
+        .btn-link-reset { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; cursor: pointer;}
+        .btn-link-reset:hover { color: var(--gxo-red); text-decoration: underline; }
+        .btn-xs-custom { padding: 0.1rem 0.5rem; font-size: 0.75rem; border-radius: 4px; background-color: var(--border-color); color: var(--text-main); border: none; }
+        .btn-xs-custom:hover { background-color: var(--gxo-red); color: white; }
+
+        /* Status de carga automática */
+        #autoLoadStatus { font-size: 0.75rem; margin-right: 10px; color: var(--text-muted); display: none; }
+        
+        @media (max-width: 768px) {
+            .navbar { padding: 0.5rem 1rem; } .navbar-brand img { height: 32px; } .navbar-text-subtitle { display: none !important; }
+            #csvInput { width: 130px; font-size: 0.75rem; } .container-fluid { padding-left: 10px !important; padding-right: 10px !important; }
+            .kpi-value { font-size: 1.4rem; } .kpi-label { font-size: 0.65rem; } canvas { max-height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <div class="spinner-border text-danger" style="width: 3rem; height: 3rem;"></div>
+    <h5 class="mt-3" style="color:var(--text-main)">Procesando...</h5>
+    <small id="loader-subtext" class="text-muted">Cargando datos</small>
+</div>
+
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid p-0">
+        <a class="navbar-brand d-flex align-items-center me-0" href="#">
+            <img src="GXO_rgb_DigitalUse.png" alt="GXO" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <span style="display:none; font-weight:900; font-size:1.5rem; color:#E30613;">GXO</span>
+            <span class="ms-3 d-none d-md-block small border-start ps-3 navbar-text-subtitle fw-bold">Logistics v11.0 AutoLoad</span>
+        </a>
+        <div class="d-flex align-items-center gap-2">
+            <span id="autoLoadStatus"><i class="bi bi-arrow-repeat"></i> Buscando database.csv...</span>
+            <input type="file" id="csvInput" accept=".csv" class="form-control form-control-sm" style="max-width: 250px;">
+            <button class="btn-lantern" id="darkModeToggle" title="Modo Noche"><i class="bi bi-lightbulb-fill"></i></button>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid py-3 px-md-4">
+    <ul class="nav nav-tabs mb-3" id="mainTab" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#global">Visión Global</button></li>
+        <li class="nav-item"><button class="nav-link" id="tab-btn-user" data-bs-toggle="tab" data-bs-target="#user">Detalle Usuario</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#bulk">Buscador Masivo</button></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="global">
+            <div class="card p-3 mb-3">
+                <div class="row g-2 align-items-end">
+                    <div class="col-6 col-md-2">
+                        <label class="form-label small text-label-dark mb-1">Filtro de Tiempo</label>
+                        <select id="filterMode" class="form-select form-select-sm">
+                            <option value="history">Histórico Completo</option>
+                            <option value="year">Por Año</option>
+                            <option value="month">Por Mes</option>
+                            <option value="week">Por Semanas</option>
+                            <option value="day">Por Días</option>
+                            <option value="last7">Últimos 7 Días</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label id="lblFilterAux" class="form-label small text-label-dark mb-1">Selección Temporal</label>
+                        <select id="filterAux" class="form-select form-select-sm" disabled><option>Todo el Histórico</option></select>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label small text-label-dark m-0">Actividades</label>
+                            <button class="btn-xs-custom" onclick="selectAllActivities()">Seleccionar Todas</button>
+                        </div>
+                        <select id="filterActivities" multiple class="form-control"></select>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <div class="row g-1">
+                            <div class="col-6"><button class="btn btn-sm btn-outline-primary w-100 fw-bold" id="btnToggleGlobalView" onclick="toggleGlobalView()"><i class="bi bi-table"></i> LISTADO</button></div>
+                            <div class="col-6"><button class="btn btn-sm btn-outline-secondary w-100" onclick="resetGlobalFilters()"><i class="bi bi-x-circle"></i> Limpiar</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-6 col-lg-3"><div class="card p-3 text-center h-100 d-flex justify-content-center"><div class="kpi-label">Volumen Total</div><div class="kpi-value" id="kpi-vol-total">-</div></div></div>
+                <div class="col-6 col-lg-3"><div class="card p-3 text-center h-100 d-flex justify-content-center"><div class="kpi-label">Horas Totales</div><div class="kpi-value" id="kpi-hours-total">-</div></div></div>
+                <div class="col-6 col-lg-3"><div class="card p-3 text-center h-100 d-flex justify-content-center"><div class="kpi-label">Eficiencia Media</div><div class="kpi-value text-gxo" id="kpi-eff-avg">-</div></div></div>
+                <div class="col-6 col-lg-3"><div class="card p-2 h-100 d-flex align-items-center justify-content-center position-relative"><div style="height: 120px; width: 100%;"><canvas id="kpi-donut-cat"></canvas></div></div></div>
+            </div>
+
+            <div id="chartsContainer" class="row justify-content-center g-3"></div>
+            
+            <div id="globalListContainer" class="card p-0 overflow-hidden d-none">
+                <div class="card-header bg-transparent text-label-dark d-flex justify-content-between align-items-center">
+                    <span class="small fw-bold text-uppercase">Listado de Usuarios</span>
+                    <span class="badge bg-secondary rounded-pill" id="globalListCount">0</span>
+                </div>
+                <div class="table-responsive" style="max-height: 600px;">
+                    <table class="table table-hover align-middle mb-0 text-center small">
+                        <thead class="sticky-top">
+                            <tr><th>Usuario / ID</th><th>Periodo</th><th>Prod. Real</th><th>Eficiencia</th><th>Cat. Ponderada</th></tr>
+                        </thead>
+                        <tbody id="globalListBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="user">
+            <div class="row g-3">
+                <div class="col-12 col-lg-4">
+                    <div class="card p-3">
+                        <label class="form-label fw-bold small text-label-dark">BUSCAR EMPLEADO</label>
+                        <input type="text" id="userSearchInput" list="userList" class="form-control mb-3" placeholder="ID o Nombre + ENTER">
+                        <datalist id="userList"></datalist>
+
+                        <div id="userStats" class="d-none">
+                            <h4 id="userNameDisplay" class="fw-bold mb-2 text-gxo text-break">Usuario</h4>
+                            <div class="d-flex justify-content-between mb-2 small text-label-dark"><span>Eficiencia Media:</span><span class="fw-bold fs-5" id="userEffDisplay">0%</span></div>
+                            <div class="d-flex justify-content-between mb-2 small text-label-dark"><span>Actividad Top:</span><span class="fw-bold" id="userMainActDisplay">-</span></div>
+                            <div class="d-flex justify-content-between mb-3 small text-label-dark align-items-center"><span>Categoría Actual:</span><span id="userWeightedCatDisplay" class="badge-gxo bg-light">...</span></div>
+                            <hr style="border-color: var(--border-color);">
+                            <div class="row g-2 mb-2">
+                                <div class="col-6"><label class="small text-label-dark">Operativa</label><select id="userActFilter" class="form-select form-select-sm"><option value="ALL">Todas</option></select></div>
+                                <div class="col-6"><label class="small text-label-dark">Tiempo</label><select id="userTimeFilter" class="form-select form-select-sm"><option value="ALL">Histórico</option><option value="last7">Últimos 7 Días</option><option value="month">Por Mes</option><option value="day">Por Día</option></select></div>
+                            </div>
+                            <div id="userSubFilterContainer" class="mb-3 d-none"><label id="userSubFilterLabel" class="small text-label-dark text-gxo fw-bold">Seleccionar:</label><select id="userSubFilter" class="form-select form-select-sm"></select></div>
+                            <div class="text-center mt-2"><button class="btn btn-sm btn-outline-danger w-100" onclick="resetUserFull()">Limpiar Filtros</button></div>
+                        </div>
+                    </div>
+                    <div class="card p-3 d-none" id="userTrendCard">
+                        <h6 class="card-title small text-label-dark text-uppercase mb-3">Tendencia</h6>
+                        <div style="position: relative; height: 200px; width: 100%;"><canvas id="userTrendChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-8">
+                    <div class="card p-0 overflow-hidden h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-transparent">
+                            <span class="small fw-bold text-uppercase text-label-dark">Registro Jornadas</span>
+                            <span class="badge bg-secondary rounded-pill" id="userRecordCount">0</span>
+                        </div>
+                        <div class="table-responsive" style="max-height: 650px;">
+                            <table class="table table-hover align-middle mb-0 text-center small"><thead class="sticky-top"><tr><th>Fecha</th><th>Actividad</th><th>Real</th><th>Target</th><th>Eficiencia</th><th>Categoría</th></tr></thead><tbody id="userTableBody"></tbody></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="bulk">
+            <div class="row g-3">
+                <div class="col-12 col-lg-3">
+                    <div class="card p-3">
+                        <label class="form-label fw-bold text-label-dark">Pegar Lista (IDs)</label>
+                        <textarea id="bulkInput" class="form-control mb-3" rows="12" placeholder="Pegar columna de Excel..."></textarea>
+                        <button class="btn btn-danger w-100 mb-2" onclick="processBulk()">Procesar Lista</button>
+                        <div class="text-center"><span class="btn-link-reset" onclick="document.getElementById('bulkInput').value=''; document.getElementById('bulkTableBody').innerHTML='';">Limpiar Filtro</span></div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-9">
+                    <div class="card p-0">
+                        <div class="card-header bg-transparent text-label-dark">Resultados Comparativos</div>
+                        <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Usuario / ID</th><th>Operativa Principal</th><th class="text-center">Eficiencia Global</th><th class="text-center">Clasificación</th></tr></thead><tbody id="bulkTableBody" style="cursor: pointer;"></tbody></table></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+<script>
+// CONFIGURACIÓN PRINCIPAL
+const DEFAULT_CSV_NAME = 'database.csv'; // <--- NOMBRE FIJO PARA AUTO-CARGA
+const TARGETS = {
+    "EMPAQUETADO": 62, "UBICACION AGVS": 250, "UBICACION": 220, 
+    "UBICACION BULTO COMPLETO": 500, "RBS PICKING": 90, "VENTILACION": 250, 
+    "PICKING TRANSFER": 100, "CD PICKING": 100, "PICKING AUTOMATIZADO": 125, 
+    "DEVOLUCIONES ONLINE": 56, "PICKING": 45
+};
+
+const PALETTE = {
+    bar: '#ffab91', target_light: '#37474f', target_dark: '#ffffff',
+    trend_fill: 'rgba(227, 6, 19, 0.1)', best: '#a5d6a7', normal: '#ffe082', worst: '#ef9a9a'
+};
+
+const MONTH_NAMES_SHORT = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+
+let appData = [];
+let filteredData = [];
+let choicesInstance = null;
+let charts = {};
+let isDarkMode = false;
+let latestDateInDB = new Date();
+let isGlobalListView = false; 
+
+function getColorStatus(efficiency, csvCategory) {
+    let label = "NORMAL";
+    if (csvCategory && csvCategory.trim() !== "") {
+        const catUpper = csvCategory.toUpperCase().trim();
+        if(catUpper.includes("BEST")) label = "BEST";
+        else if(catUpper.includes("WORST")) label = "WORST";
+        else label = "NORMAL";
+    } else {
+        if (efficiency > 115) label = "BEST";
+        else if (efficiency < 85) label = "WORST";
+        else label = "NORMAL";
+    }
+    let style = { badgeClass: '', textClass: '', label: label };
+    if (label === "BEST") { style.badgeClass = "bg-best"; style.textClass = "text-best"; }
+    else if (label === "WORST") { style.badgeClass = "bg-worst"; style.textClass = "text-worst"; }
+    else { style.badgeClass = "bg-normal"; style.textClass = "text-normal"; }
+    return style;
+}
+
+// --- INIT ---
+document.addEventListener('DOMContentLoaded', () => {
+    choicesInstance = new Choices('#filterActivities', {
+        removeItemButton: true, placeholderValue: 'Seleccionar Actividades', itemSelectText: ''
+    });
+
+    document.getElementById('csvInput').addEventListener('change', handleFileUpload);
+    document.getElementById('filterMode').addEventListener('change', updateAuxFilter);
+    document.getElementById('filterAux').addEventListener('change', runGlobalAnalysis);
+    document.getElementById('filterActivities').addEventListener('change', runGlobalAnalysis);
+    
+    const userSearch = document.getElementById('userSearchInput');
+    userSearch.addEventListener('change', () => searchUser(userSearch.value));
+    userSearch.addEventListener('keyup', (e) => { if(e.key === 'Enter') searchUser(userSearch.value); });
+    
+    document.getElementById('userActFilter').addEventListener('change', filterUserTable);
+    document.getElementById('userTimeFilter').addEventListener('change', updateUserSubFilters); 
+    document.getElementById('userSubFilter').addEventListener('change', filterUserTable);
+    document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+
+    // INTENTO DE AUTO-CARGA AL ABRIR
+    tryAutoLoadCSV();
+});
+
+// NUEVA FUNCION: INTENTAR CARGAR database.csv
+function tryAutoLoadCSV() {
+    const statusEl = document.getElementById('autoLoadStatus');
+    statusEl.style.display = 'block';
+    
+    fetch(DEFAULT_CSV_NAME)
+        .then(response => {
+            if (!response.ok) throw new Error("Archivo no encontrado");
+            return response.text();
+        })
+        .then(csvText => {
+            statusEl.innerHTML = '<span class="text-success fw-bold"><i class="bi bi-check-circle"></i> Auto-cargado</span>';
+            setTimeout(() => statusEl.style.display = 'none', 3000);
+            
+            Papa.parse(csvText, {
+                header: true, skipEmptyLines: true, delimiter: ";",
+                complete: function(results) { processRawData(results.data); }
+            });
+        })
+        .catch(err => {
+            console.log("Autoload falló (Normal si no hay database.csv o por seguridad del navegador):", err);
+            statusEl.innerHTML = '<span class="text-muted"><i class="bi bi-info-circle"></i> Usa carga manual</span>';
+        });
+}
+
+function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    document.body.classList.toggle('dark-mode');
+    document.getElementById('darkModeToggle').classList.toggle('active');
+    Chart.defaults.color = isDarkMode ? '#e0e0e0' : '#2c3e50';
+    Chart.defaults.borderColor = isDarkMode ? '#333333' : '#eeeeee';
+    runGlobalAnalysis();
+    if(!document.getElementById('userStats').classList.contains('d-none')) { filterUserTable(); }
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    document.getElementById('loader').style.display = 'flex';
+    document.getElementById('loader-subtext').innerText = "Leyendo fichero CSV...";
+
+    setTimeout(() => {
+        Papa.parse(file, {
+            header: true, skipEmptyLines: true, delimiter: ";",
+            complete: function(results) {
+                processRawData(results.data);
+                document.getElementById('loader').style.display = 'none';
+            },
+            error: function(err) {
+                alert("Error: " + err.message);
+                document.getElementById('loader').style.display = 'none';
+            }
+        });
+    }, 100);
+}
+
+function processRawData(data) {
+    let maxTs = 0;
+    appData = data.map(row => {
+        const parseNum = (v) => {
+            if (!v) return 0;
+            if (typeof v === 'number') return v;
+            return parseFloat(v.replace(/\./g, '').replace(',', '.'));
+        };
+        const dParts = row['Fecha'] ? row['Fecha'].split('/') : ['01','01','1970'];
+        const jsDate = new Date(`${dParts[2]}-${dParts[1]}-${dParts[0]}`);
+        if(jsDate.getTime() > maxTs) maxTs = jsDate.getTime();
+
+        const oneJan = new Date(jsDate.getFullYear(), 0, 1);
+        const numberOfDays = Math.floor((jsDate - oneJan) / (24 * 60 * 60 * 1000));
+        const weekNum = Math.ceil((jsDate.getDay() + 1 + numberOfDays) / 7);
+        
+        const monthShort = MONTH_NAMES_SHORT[jsDate.getMonth()];
+        const yearShort = jsDate.getFullYear().toString().slice(-2);
+        const monthLabel = `${monthShort} ${yearShort}`;
+        const monthSortId = jsDate.getFullYear() * 100 + jsDate.getMonth();
+
+        return {
+            id: row['Usuario'], name: row['Nombre'],
+            date: jsDate, ts: jsDate.getTime(), dateStr: row['Fecha'],
+            year: jsDate.getFullYear(), month: jsDate.getMonth(), 
+            monthLabel: monthLabel, monthSortId: monthSortId,
+            weekLabel: `Semana ${weekNum} - ${jsDate.getFullYear()}`,
+            activity: (row['Actividad'] || "").toUpperCase().trim(),
+            production: parseNum(row['Produccion']), productivity: parseNum(row['Productividad']),
+            hours: parseNum(row['Tiempo_Final']), category: row['Categoria']
+        };
+    }).filter(d => d.activity && d.id);
+
+    latestDateInDB = new Date(maxTs);
+    populateFilters();
+    populateUserSearch();
+    runGlobalAnalysis();
+}
+
+function populateFilters() {
+    const acts = [...new Set(appData.map(d => d.activity))].sort();
+    const choices = acts.map(act => ({ value: act, label: act, selected: true }));
+    choicesInstance.setChoices(choices, 'value', 'label', true);
+    updateAuxFilter();
+}
+
+function selectAllActivities() {
+    const acts = [...new Set(appData.map(d => d.activity))].sort();
+    choicesInstance.setChoiceByValue(acts);
+    runGlobalAnalysis();
+}
+
+function resetGlobalFilters() {
+    choicesInstance.removeActiveItems();
+    document.getElementById('filterMode').value = 'history';
+    updateAuxFilter();
+}
+
+function updateAuxFilter() {
+    const mode = document.getElementById('filterMode').value;
+    const auxSelect = document.getElementById('filterAux');
+    const lbl = document.getElementById('lblFilterAux');
+    auxSelect.innerHTML = ''; auxSelect.disabled = false;
+    let options = [];
+
+    switch(mode) {
+        case 'history': auxSelect.disabled = true; auxSelect.add(new Option("Todo el Histórico", "ALL")); lbl.innerText = "Selección Temporal"; break;
+        case 'last7': auxSelect.disabled = true; auxSelect.add(new Option("Últimos 7 Días Registrados", "ALL")); lbl.innerText = "Selección Temporal"; break;
+        case 'year': lbl.innerText = "Seleccionar Año"; options = [...new Set(appData.map(d => d.year))].sort().reverse(); break;
+        case 'month': lbl.innerText = "Seleccionar Mes"; 
+            const uniqueMonths = [...new Map(appData.map(item => [item.monthLabel, item])).values()];
+            uniqueMonths.sort((a,b) => b.monthSortId - a.monthSortId); 
+            options = uniqueMonths.map(d => d.monthLabel); break;
+        case 'week': lbl.innerText = "Seleccionar Semana"; options = [...new Set(appData.map(d => d.weekLabel))].sort().reverse(); break;
+        case 'day': lbl.innerText = "Seleccionar Día";
+            options = [...new Set(appData.map(d => d.dateStr))].sort((a,b) => {
+                const da = a.split('/'); const db = b.split('/');
+                return new Date(db[2],db[1]-1,db[0]) - new Date(da[2],da[1]-1,da[0]);
+            });
+            options = options.slice(0, 100); break;
+    }
+    options.forEach(o => auxSelect.add(new Option(o, o)));
+    runGlobalAnalysis();
+}
+
+function toggleGlobalView() {
+    isGlobalListView = !isGlobalListView;
+    const btn = document.getElementById('btnToggleGlobalView');
+    if(isGlobalListView) {
+        btn.innerHTML = '<i class="bi bi-graph-up"></i> GRÁFICA';
+        btn.classList.replace('btn-outline-primary', 'btn-outline-dark');
+    } else {
+        btn.innerHTML = '<i class="bi bi-table"></i> LISTADO';
+        btn.classList.replace('btn-outline-dark', 'btn-outline-primary');
+    }
+    if (isGlobalListView) {
+        document.getElementById('loader').style.display = 'flex';
+        document.getElementById('loader-subtext').innerText = "Generando tabla masiva...";
+        setTimeout(runGlobalAnalysis, 50); 
+    } else {
+        runGlobalAnalysis();
+    }
+}
+
+function runGlobalAnalysis() {
+    if (appData.length === 0) return;
+    const mode = document.getElementById('filterMode').value;
+    const auxVal = document.getElementById('filterAux').value;
+    const selectedActs = choicesInstance.getValue(true);
+    const actFilterList = selectedActs.length > 0 ? selectedActs : [...new Set(appData.map(d => d.activity))];
+    const sevenDaysAgo = new Date(latestDateInDB);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    filteredData = appData.filter(d => {
+        if (selectedActs.length > 0 && !selectedActs.includes(d.activity)) return false;
+        if (mode === 'history') return true;
+        if (mode === 'year') return d.year == auxVal;
+        if (mode === 'month') return d.monthLabel === auxVal;
+        if (mode === 'week') return d.weekLabel === auxVal;
+        if (mode === 'day') return d.dateStr === auxVal;
+        if (mode === 'last7') return d.ts >= sevenDaysAgo.getTime();
+        return true;
+    });
+
+    updateGlobalKPIs();
+    const chartsCont = document.getElementById('chartsContainer');
+    const listCont = document.getElementById('globalListContainer');
+
+    if (isGlobalListView) {
+        chartsCont.classList.add('d-none'); listCont.classList.remove('d-none');
+        renderGlobalListAsync(auxVal);
+    } else {
+        chartsCont.classList.remove('d-none'); listCont.classList.add('d-none');
+        renderGlobalCharts(actFilterList);
+        document.getElementById('loader').style.display = 'none';
+    }
+}
+
+function updateGlobalKPIs() {
+    const totalVol = filteredData.reduce((acc, curr) => acc + curr.production, 0);
+    const totalHours = filteredData.reduce((acc, curr) => acc + curr.hours, 0);
+    let sumEff = 0; let countEff = 0;
+    const cats = { BEST: 0, NORMAL: 0, WORST: 0 };
+    filteredData.forEach(d => {
+        const t = TARGETS[d.activity] || 0;
+        let eff = t > 0 ? (d.productivity / t) * 100 : 0;
+        if(t > 0) { sumEff += eff; countEff++; }
+        const st = getColorStatus(eff, d.category);
+        if(st.label === "BEST") cats.BEST++; else if(st.label === "WORST") cats.WORST++; else cats.NORMAL++;
+    });
+    document.getElementById('kpi-vol-total').innerText = (totalVol / 1000).toFixed(1) + "k";
+    document.getElementById('kpi-hours-total').innerText = totalHours.toFixed(0);
+    document.getElementById('kpi-eff-avg').innerText = countEff > 0 ? (sumEff / countEff).toFixed(1) + "%" : "0%";
+    renderDonut(cats);
+}
+
+function renderDonut(cats) {
+    const ctx = document.getElementById('kpi-donut-cat').getContext('2d');
+    if (charts['donut']) charts['donut'].destroy();
+    const total = cats.BEST + cats.NORMAL + cats.WORST;
+    charts['donut'] = new Chart(ctx, {
+        type: 'doughnut', plugins: [ChartDataLabels],
+        data: { labels: ['Best', 'Normal', 'Worst'], datasets: [{ data: [cats.BEST, cats.NORMAL, cats.WORST], backgroundColor: [PALETTE.best, PALETTE.normal, PALETTE.worst], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { display: true, position: 'right', labels: { color: isDarkMode ? '#e0e0e0' : '#333', boxWidth: 10, font: {size: 10} } }, datalabels: { color: '#333', font: { weight: 'bold', size: 10 }, formatter: (value) => value > 0 ? ((value/total)*100).toFixed(0) + "%" : "" } } }
+    });
+}
+
+function renderGlobalCharts(activities) {
+    const container = document.getElementById('chartsContainer'); container.innerHTML = '';
+    const mode = document.getElementById('filterMode').value;
+    const groupDaily = ['month', 'week', 'day', 'last7'].includes(mode);
+    activities.forEach(act => {
+        if (!TARGETS[act]) return;
+        const actData = filteredData.filter(d => d.activity === act);
+        if (actData.length === 0) return;
+        const groups = {};
+        actData.forEach(d => {
+            const key = groupDaily ? d.dateStr : d.monthLabel;
+            const sId = groupDaily ? d.ts : d.monthSortId;
+            if (!groups[key]) groups[key] = { sumProd: 0, count: 0, sortId: sId };
+            groups[key].sumProd += d.productivity; groups[key].count++;
+        });
+        const labels = Object.keys(groups).sort((a,b) => groups[a].sortId - groups[b].sortId);
+        const dataReal = labels.map(k => (groups[k].sumProd / groups[k].count).toFixed(1));
+        const dataTarget = new Array(labels.length).fill(TARGETS[act]);
+        const col = document.createElement('div'); col.className = 'col-12 col-lg-6 mb-3'; 
+        col.innerHTML = `<div class="card p-3 h-100"><h6 class="text-center fw-bold mb-3 small text-uppercase text-gxo">${act}</h6><div style="height: 220px;"><canvas></canvas></div></div>`;
+        container.appendChild(col);
+        new Chart(col.querySelector('canvas').getContext('2d'), {
+            type: 'bar', data: { labels: labels, datasets: [ { label: 'Objetivo', data: dataTarget, type: 'line', borderColor: isDarkMode ? PALETTE.target_dark : PALETTE.target_light, borderWidth: 2, pointRadius: 2, spanGaps: true, order: 1 }, { label: 'Real', data: dataReal, backgroundColor: PALETTE.bar, borderRadius: 4, order: 2 } ] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } }
+        });
+    });
+}
+
+// ASYNC CHUNKS
+let globalUserListCache = [];
+function renderGlobalListAsync(filterLabel) {
+    const tbody = document.getElementById('globalListBody'); tbody.innerHTML = '';
+    const userMap = new Map();
+    filteredData.forEach(d => {
+        if(!userMap.has(d.id)) { userMap.set(d.id, { id: d.id, name: d.name, sumProd: 0, countProd: 0, sumEff: 0, countEff: 0, cats: { BEST:0, NORMAL:0, WORST:0 } }); }
+        const u = userMap.get(d.id);
+        u.sumProd += d.productivity; u.countProd++;
+        const t = TARGETS[d.activity] || 0;
+        if(t > 0) { u.sumEff += (d.productivity/t)*100; u.countEff++; }
+        const st = getColorStatus((t>0 ? (d.productivity/t)*100 : 0), d.category);
+        if(st.label === "BEST") u.cats.BEST++; else if(st.label === "WORST") u.cats.WORST++; else u.cats.NORMAL++;
+    });
+    globalUserListCache = Array.from(userMap.values());
+    document.getElementById('globalListCount').innerText = globalUserListCache.length;
+    let dateTerm = filterLabel === "ALL" ? "Histórico" : filterLabel;
+    const chunkSize = 50; let currentIndex = 0;
+    function renderChunk() {
+        const fragment = document.createDocumentFragment();
+        const limit = Math.min(currentIndex + chunkSize, globalUserListCache.length);
+        for (let i = currentIndex; i < limit; i++) {
+            const u = globalUserListCache[i];
+            const avgProd = u.countProd > 0 ? (u.sumProd / u.countProd).toFixed(1) : 0;
+            const avgEff = u.countEff > 0 ? (u.sumEff / u.countEff).toFixed(0) : 0;
+            const sBest = u.cats.BEST * 0.3; const sNorm = u.cats.NORMAL * 0.3; const sWorst = u.cats.WORST * 0.4;
+            let label = "NORMAL"; if (sWorst >= sBest && sWorst >= sNorm) label = "WORST"; else if (sBest >= sNorm && sBest > sWorst) label = "BEST";
+            const style = getColorStatus(0, label); const effStyle = getColorStatus(avgEff, "");
+            const tr = document.createElement('tr'); tr.style.cursor = 'pointer';
+            tr.onclick = function() { document.querySelector('#tab-btn-user').click(); document.getElementById('userSearchInput').value = u.id; searchUser(u.id); };
+            tr.innerHTML = `<td><div class="fw-bold">${u.name}</div><div class="small text-muted">${u.id}</div></td><td>${dateTerm}</td><td>${avgProd}</td><td><span class="eff-val ${effStyle.textClass}">${avgEff}%</span></td><td><span class="badge-gxo ${style.badgeClass}">${label}</span></td>`;
+            fragment.appendChild(tr);
+        }
+        tbody.appendChild(fragment);
+        currentIndex += chunkSize;
+        if (currentIndex < globalUserListCache.length) { requestAnimationFrame(renderChunk); } else { document.getElementById('loader').style.display = 'none'; }
+    }
+    renderChunk();
+}
+
+let currentUserData = [];
+function populateUserSearch() {
+    const uniqueUsers = new Map(); appData.forEach(d => { if (!uniqueUsers.has(d.id)) uniqueUsers.set(d.id, d.name); });
+    const datalist = document.getElementById('userList'); datalist.innerHTML = '';
+    uniqueUsers.forEach((name, id) => { const opt = document.createElement('option'); opt.value = id; opt.label = name; datalist.appendChild(opt); });
+}
+
+function searchUser(input) {
+    if (!input) return;
+    const records = appData.filter(d => d.id === input || d.name === input);
+    if (records.length === 0) return;
+    currentUserData = records;
+    document.getElementById('userStats').classList.remove('d-none'); document.getElementById('userTrendCard').classList.remove('d-none');
+    document.getElementById('userNameDisplay').innerText = records[0].name;
+    const uActs = [...new Set(records.map(d => d.activity))];
+    const sel = document.getElementById('userActFilter'); sel.innerHTML = '<option value="ALL">Todas</option>';
+    uActs.forEach(a => sel.add(new Option(a, a)));
+    document.getElementById('userTimeFilter').value = 'ALL'; updateUserSubFilters(); filterUserTable();
+}
+
+function resetUserFull() {
+    document.getElementById('userSearchInput').value = ''; document.getElementById('userStats').classList.add('d-none'); document.getElementById('userTrendCard').classList.add('d-none');
+    document.getElementById('userTableBody').innerHTML = ''; document.getElementById('userRecordCount').innerText = '0'; currentUserData = [];
+}
+
+function updateUserSubFilters() {
+    const timeVal = document.getElementById('userTimeFilter').value;
+    const container = document.getElementById('userSubFilterContainer'); const label = document.getElementById('userSubFilterLabel'); const select = document.getElementById('userSubFilter');
+    select.innerHTML = '';
+    if (timeVal === 'month') {
+        container.classList.remove('d-none'); label.innerText = "Seleccionar Mes:";
+        const months = [...new Set(currentUserData.map(d => d.monthLabel))]; months.forEach(m => select.add(new Option(m, m)));
+    } else if (timeVal === 'day') {
+        container.classList.remove('d-none'); label.innerText = "Seleccionar Día:";
+        const days = [...new Set(currentUserData.map(d => d.dateStr))].sort((a,b) => { const da = a.split('/'); const db = b.split('/'); return new Date(db[2],db[1]-1,db[0]) - new Date(da[2],da[1]-1,da[0]); });
+        days.forEach(d => select.add(new Option(d, d)));
+    } else { container.classList.add('d-none'); }
+    filterUserTable();
+}
+
+function calculateUserWeightedCategory(data) {
+    const counts = { BEST: 0, NORMAL: 0, WORST: 0 };
+    data.forEach(d => { const t = TARGETS[d.activity] || 0; const eff = t > 0 ? (d.productivity/t)*100 : 0; const st = getColorStatus(eff, d.category); if(st.label === "BEST") counts.BEST++; else if(st.label === "WORST") counts.WORST++; else counts.NORMAL++; });
+    const sBest = counts.BEST * 0.3; const sNorm = counts.NORMAL * 0.3; const sWorst = counts.WORST * 0.4;
+    let label = "NORMAL"; if (sWorst >= sBest && sWorst >= sNorm) label = "WORST"; else if (sBest >= sNorm && sBest > sWorst) label = "BEST";
+    const style = getColorStatus(0, label); const badge = document.getElementById('userWeightedCatDisplay');
+    badge.className = `badge-gxo ${style.badgeClass}`; badge.innerText = label;
+}
+
+function filterUserTable() {
+    const actFilter = document.getElementById('userActFilter').value; const timeFilter = document.getElementById('userTimeFilter').value; const subFilter = document.getElementById('userSubFilter').value;
+    let data = currentUserData;
+    if (actFilter !== 'ALL') data = data.filter(d => d.activity === actFilter);
+    if (timeFilter === 'last7') { const limit = new Date(latestDateInDB); limit.setDate(limit.getDate()-7); data = data.filter(d => d.ts >= limit.getTime()); } 
+    else if (timeFilter === 'month' && subFilter) { data = data.filter(d => d.monthLabel === subFilter); } 
+    else if (timeFilter === 'day' && subFilter) { data = data.filter(d => d.dateStr === subFilter); }
+    let sumEff = 0; let countEff = 0; const actCounts = {};
+    data.forEach(d => { const t = TARGETS[d.activity] || 0; if(t > 0) { sumEff += (d.productivity/t)*100; countEff++; } actCounts[d.activity] = (actCounts[d.activity]||0)+1; });
+    const avgEff = countEff > 0 ? (sumEff/countEff).toFixed(1) : 0;
+    const mainAct = Object.keys(actCounts).length ? Object.keys(actCounts).reduce((a, b) => actCounts[a] > actCounts[b] ? a : b) : "-";
+    document.getElementById('userEffDisplay').innerText = avgEff + "%"; document.getElementById('userMainActDisplay').innerText = mainAct;
+    calculateUserWeightedCategory(data);
+    const tbody = document.getElementById('userTableBody'); tbody.innerHTML = '';
+    data.sort((a,b) => b.ts - a.ts);
+    document.getElementById('userRecordCount').innerText = Math.min(data.length, 500);
+    data.slice(0, 500).forEach(d => {
+        const t = TARGETS[d.activity] || 0; const eff = t > 0 ? ((d.productivity/t)*100).toFixed(0) : 0; const style = getColorStatus(eff, d.category);
+        tbody.innerHTML += `<tr><td>${d.dateStr}</td><td class="small fw-bold">${d.activity}</td><td>${d.productivity.toFixed(1)}</td><td>${t}</td><td><span class="eff-val ${style.textClass}">${eff}%</span></td><td><span class="badge-gxo ${style.badgeClass}">${style.label}</span></td></tr>`;
+    });
+    renderUserTrend(data);
+}
+
+function renderUserTrend(data) {
+    const ctx = document.getElementById('userTrendChart').getContext('2d'); if(charts['userTrend']) charts['userTrend'].destroy();
+    const daily = {}; data.forEach(d => { const t = TARGETS[d.activity] || 0; if(t>0) { if(!daily[d.dateStr]) daily[d.dateStr] = {sum:0, cnt:0, ts: d.ts}; daily[d.dateStr].sum += (d.productivity/t)*100; daily[d.dateStr].cnt++; } });
+    const sortedDates = Object.keys(daily).sort((a,b) => daily[a].ts - daily[b].ts);
+    const values = sortedDates.map(k => (daily[k].sum/daily[k].cnt).toFixed(1));
+    const isSingleRecord = sortedDates.length === 1; const chartType = isSingleRecord ? 'bar' : 'line'; const targetData = new Array(values.length).fill(100);
+    charts['userTrend'] = new Chart(ctx, {
+        type: chartType, data: { labels: sortedDates, datasets: [ { label: 'Eficiencia %', data: values, borderColor: isDarkMode ? '#E30613' : '#37474f', backgroundColor: isSingleRecord ? PALETTE.bar : PALETTE.trend_fill, borderWidth: 2, tension: 0.3, fill: !isSingleRecord, pointRadius: isSingleRecord ? 0 : 2, order: 2, barPercentage: 0.2 }, { type: 'line', label: 'Objetivo (100%)', data: targetData, borderColor: isDarkMode ? PALETTE.target_dark : PALETTE.target_light, borderWidth: 2, borderDash: [5, 5], pointRadius: 0, spanGaps: true, order: 1 } ] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { y: { beginAtZero: true }, x: { grid:{display:false} } } }
+    });
+}
+
+function processBulk() {
+    const raw = document.getElementById('bulkInput').value; const tokens = raw.split(/[\n,]+/).map(t => t.trim()).filter(t => t !== "");
+    const tbody = document.getElementById('bulkTableBody'); tbody.innerHTML = '';
+    const results = [];
+    tokens.forEach(token => {
+        const uRows = appData.filter(d => d.id === token || d.name === token);
+        if (uRows.length === 0) return;
+        let sumEff = 0; let cntEff = 0; const counts = {};
+        uRows.forEach(d => { counts[d.activity] = (counts[d.activity]||0)+1; const t = TARGETS[d.activity] || 0; if(t>0) { sumEff+=(d.productivity/t)*100; cntEff++; } });
+        results.push({ id: uRows[0].id, name: uRows[0].name, main: Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b), eff: cntEff > 0 ? (sumEff/cntEff) : 0 });
+    });
+    results.forEach(r => {
+        const style = getColorStatus(r.eff, "");
+        tbody.innerHTML += `<tr onclick="document.querySelector('#tab-btn-user').click(); document.getElementById('userSearchInput').value='${r.id}'; searchUser('${r.id}');"><td><div class="fw-bold">${r.name}</div><div class="small text-muted">${r.id}</div></td><td class="fw-bold">${r.main}</td><td class="text-center"><span class="eff-val ${style.textClass}">${r.eff.toFixed(1)}%</span></td><td class="text-center"><span class="badge-gxo ${style.badgeClass}">${style.label}</span></td></tr>`;
+    });
+}
+</script>
+</body>
+</html>
