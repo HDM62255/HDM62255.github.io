@@ -1,2 +1,0 @@
-# HDM62255.github.io
-DASHBOARD GXO
