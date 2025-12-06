@@ -36,8 +36,7 @@
             </a>
             <div class="d-flex align-items-center gap-2">
                 <span id="autoLoadStatus"><i class="bi bi-arrow-repeat"></i> Buscando database.csv...</span>
-                <input type="file" id="csvInput" accept=".csv" class="form-control form-control-sm"
-                    style="max-width: 250px;">
+
                 <button class="btn-lantern" id="darkModeToggle" title="Modo Noche"><i
                         class="bi bi-lightbulb-fill"></i></button>
             </div>
@@ -171,7 +170,7 @@
                         <div class="card p-3">
                             <label class="form-label fw-bold small text-label-dark">BUSCAR EMPLEADO</label>
                             <input type="text" id="userSearchInput" list="userList" class="form-control mb-3"
-                                placeholder="ID o Nombre + ENTER">
+                                placeholder="Usuario o Nombre">
                             <datalist id="userList"></datalist>
 
                             <div id="userStats" class="d-none">
@@ -183,7 +182,8 @@
                                 <div
                                     class="d-flex justify-content-between mb-3 small text-label-dark align-items-center">
                                     <span>Categoría Actual:</span><span id="userWeightedCatDisplay"
-                                        class="badge-gxo bg-light">...</span></div>
+                                        class="badge-gxo bg-light">...</span>
+                                </div>
                                 <hr style="border-color: var(--border-color);">
                                 <div class="row g-2 mb-2">
                                     <div class="col-6"><label class="small text-label-dark">Operativa</label><select
