@@ -1,0 +1,156 @@
+/* Calendar Component Styles */
+.calendar-widget {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 1rem;
+    font-family: 'Inter', sans-serif;
+    user-select: none;
+    z-index: 1050; /* Above most elements */
+    width: 300px;
+    max-width: 100%;
+}
+
+/* Overlay Mode for Global View */
+.calendar-overlay {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 5px;
+}
+
+/* Static Mode for User View - Inyected normally */
+.calendar-static {
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+    box-shadow: none;
+    border: 1px solid var(--border-color);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.calendar-title {
+    font-weight: 700;
+    color: var(--text-main);
+    font-size: 1rem;
+}
+
+.calendar-nav-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    border-radius: 6px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.calendar-nav-btn:hover {
+    background-color: var(--bg-body);
+    color: var(--gxo-red);
+    border-color: var(--gxo-red);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+}
+
+.calendar-day-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding-bottom: 0.5rem;
+}
+
+.calendar-day {
+    font-size: 0.85rem;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-main);
+    transition: all 0.1s;
+}
+
+.calendar-day:hover:not(.empty) {
+    background-color: var(--bg-body);
+    color: var(--gxo-red);
+    font-weight: 700;
+}
+
+.calendar-day.selected {
+    background-color: var(--gxo-red) !important;
+    color: white !important;
+    font-weight: 700;
+}
+
+.calendar-day.in-range {
+    background-color: rgba(255, 58, 0, 0.15); /* Light GXO Red */
+    color: var(--gxo-red);
+}
+
+.calendar-day.empty {
+    cursor: default;
+    pointer-events: none;
+}
+
+.calendar-day.today {
+    border: 1px solid var(--gxo-red);
+}
+
+/* Footer with Actions */
+.calendar-footer {
+    border-top: 1px solid var(--border-color);
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendar-info {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.calendar-apply-btn {
+    background-color: var(--gxo-red);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.calendar-apply-btn:hover {
+    background-color: #d10510;
+}
+
+/* Dark Mode Overrides */
+body.dark-mode .calendar-widget {
+    background-color: var(--bg-card); /* Should be dark from var */
+    border-color: #444;
+}
+
+body.dark-mode .calendar-nav-btn:hover {
+    background-color: #333;
+}
+
+body.dark-mode .calendar-day:hover:not(.empty) {
+    background-color: #333;
+}
