@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GXO Logistics | Dashboard Full Potential</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <!-- Estilos Personalizados Modularizados -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/calendar.css">
+</head>
+
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-overlay">
+        <div class="card login-card">
+            <div class="mb-4">
+                <img src="GXO_rgb_DigitalUse.png" alt="GXO" class="login-logo">
+                <div class="mt-2 fw-bold text-gxo">FULL POTENTIAL DASHBOARD</div>
+            </div>
+
+            <form id="login-form">
+                <div class="mb-3 text-start">
+                    <label for="login-username" class="form-label small fw-bold text-muted">USUARIO</label>
+                    <input type="text" class="form-control" id="login-username" placeholder="admin" required
+                        autocomplete="username">
+                </div>
+                <div class="mb-4 text-start">
+                    <label for="login-password" class="form-label small fw-bold text-muted">CONTRASEÑA</label>
+                    <input type="password" class="form-control" id="login-password" placeholder="•••••" required
+                        autocomplete="current-password">
+                </div>
+                <div id="login-error" class="login-error-msg mb-3 d-none">Credenciales Incorrectas</div>
+                <button type="submit" class="btn btn-action w-100 py-2">ENTRAR</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="loader">
+        <div class="spinner-border text-danger" style="width: 3rem; height: 3rem;"></div>
+        <h5 class="mt-3" style="color:var(--text-main)">Procesando...</h5>
+        <small id="loader-subtext" class="text-muted">Cargando datos</small>
+    </div>
+
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid p-0">
+            <a class="navbar-brand d-flex align-items-center me-0" href="#">
+                <img src="GXO_rgb_DigitalUse.png" alt="GXO"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                <span style="display:none; font-weight:900; font-size:1.5rem; color:#E30613;">GXO</span>
+
+                <span class="ms-3 d-none d-md-block small border-start ps-3 navbar-text-subtitle fw-bold">
+                    Logistic at full potential <span class="ms-1 text-gxo">Da&CI</span>
+                </span>
+            </a>
+            <div class="d-flex align-items-center gap-2">
+                <span id="autoLoadStatus"><i class="bi bi-arrow-repeat"></i> Buscando database.csv...</span>
+
+                <button class="btn-lantern" id="darkModeToggle" title="Modo Noche"><i
+                        class="bi bi-lightbulb-fill"></i></button>
+                <button class="btn-lantern ms-2" id="btnLogout" title="Cerrar Sesión"><i
+                        class="bi bi-box-arrow-right"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-3 px-md-4">
+        <ul class="nav nav-tabs mb-3 justify-content-center" id="mainTab" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#global">Visión
+                    Global</button></li>
+            <li class="nav-item"><button class="nav-link" id="tab-btn-user" data-bs-toggle="tab"
+                    data-bs-target="#user">Detalle Usuario</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#bulk">Buscador
+                    Masivo</button></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="global">
+                <div class="card p-3 mb-3">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-6 col-md-2">
+                            <label class="form-label small text-label-dark mb-1">Filtro de Tiempo</label>
+                            <select id="filterMode" class="form-select form-select-sm">
+                                <option value="history">Histórico Completo</option>
+                                <option value="year">Por Año</option>
+                                <option value="month">Por Mes</option>
+                                <option value="week">Por Semanas</option>
+                                <option value="day">Por Días</option>
+                                <option value="calendar">Calendario</option>
+                                <option value="last7">Últimos 7 Días</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label id="lblFilterAux" class="form-label small text-label-dark mb-1">Selección
+                                Temporal</label>
+                            <select id="filterAux" class="form-select form-select-sm" disabled>
+                                <option>Todo el Histórico</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label small text-label-dark m-0">Actividades</label>
+                                <button class="btn-xs-custom" id="btnSelectAllActs">Seleccionar Todas</button>
+                            </div>
+                            <select id="filterActivities" multiple class="form-control"></select>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <div class="row g-1">
+                                <div class="col-6"><button class="btn btn-sm btn-action w-100"
+                                        id="btnToggleGlobalView"><i class="bi bi-table"></i> LISTADO</button></div>
+                                <div class="col-6"><button class="btn btn-sm btn-clean w-100" id="btnResetGlobal"><i
+                                            class="bi bi-x-circle"></i> Limpiar</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6 col-lg-3">
+                        <div class="card p-3 text-center h-100 d-flex justify-content-center">
+                            <div class="kpi-label">Volumen Total</div>
+                            <div class="kpi-value" id="kpi-vol-total">-</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card p-3 text-center h-100 d-flex justify-content-center">
+                            <div class="kpi-label">Horas Totales</div>
+                            <div class="kpi-value" id="kpi-hours-total">-</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card p-3 text-center h-100 d-flex justify-content-center">
+                            <div class="kpi-label">Eficiencia Media</div>
+                            <div class="kpi-value text-gxo" id="kpi-eff-avg">-</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="card p-2 h-100 d-flex align-items-center justify-content-center position-relative">
+                            <i class="bi bi-info-circle position-absolute top-0 end-0 m-2 text-muted"
+                                style="cursor: pointer; font-size: 0.85rem;" data-bs-toggle="tooltip"
+                                data-bs-html="true"
+                                title="Clasificación dinámica basada en percentiles diarios por actividad.<br><br>• <b>Top:</b> Rendimiento superior al P70 (Top 30%).<br>• <b>Normal:</b> Rango estándar (P30 - P70).<br>• <b>Bottom:</b> Rendimiento inferior al P30 (Bottom 30%).">
+                            </i>
+                            <div style="height: 120px; width: 100%;"><canvas id="kpi-donut-cat"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chartsContainer" class="row justify-content-center g-3"></div>
+
+                <div id="globalListContainer" class="card p-0 d-none">
+                    <div
+                        class="card-header bg-transparent text-label-dark d-flex justify-content-between align-items-center">
+                        <span class="small fw-bold text-uppercase">Listado de Usuarios</span>
+                        <div>
+                            <button id="btnExportXLSX" class="btn btn-sm btn-outline-success rounded-pill me-2"><i
+                                    class="bi bi-file-earmark-excel"></i> .xlsx</button>
+                            <span class="badge bg-secondary rounded-pill" id="globalListCount">0</span>
+                        </div>
+                    </div>
+                    <div class="table-responsive" style="max-height: 600px;">
+                        <table class="table table-hover align-middle mb-0 text-center small">
+                            <thead class="sticky-top">
+                                <tr>
+                                    <th style="cursor:pointer" data-sort="name">Usuario <i
+                                            class="bi bi-sort-alpha-down small text-muted"></i></th>
+                                    <th style="cursor:pointer" data-sort="id">ID <i
+                                            class="bi bi-sort-numeric-down small text-muted"></i></th>
+                                    <th>
+                                        <div class="d-flex align-items-center justify-content-center gap-1">
+                                            Turno
+                                            <div class="dropdown">
+                                                <i class="bi bi-funnel-fill text-muted" style="cursor:pointer"
+                                                    data-bs-toggle="dropdown"></i>
+                                                <ul class="dropdown-menu shadow border-0" id="turnoFilterDropdown">
+                                                    <li><a class="dropdown-item active" href="#"
+                                                            data-val="ALL">Todos</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="d-flex align-items-center justify-content-center gap-1">
+                                            Tipo
+                                            <div class="dropdown">
+                                                <i class="bi bi-funnel-fill text-muted" style="cursor:pointer"
+                                                    data-bs-toggle="dropdown"></i>
+                                                <ul class="dropdown-menu shadow border-0" id="tipoFilterDropdown">
+                                                    <li><a class="dropdown-item active" href="#"
+                                                            data-val="ALL">Todos</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </th>
+                                    <th>Periodo</th>
+                                    <th style="cursor:pointer" data-sort="prod">Prod. Real <i
+                                            class="bi bi-arrow-down-up small text-muted"></i></th>
+                                    <th style="cursor:pointer" data-sort="eff">Eficiencia <i
+                                            class="bi bi-arrow-down-up small text-muted"></i></th>
+                                    <th>
+                                        <div class="d-flex align-items-center justify-content-center gap-1">
+                                            Cat. Ponderada
+                                            <div class="dropdown">
+                                                <i class="bi bi-funnel-fill text-muted" style="cursor:pointer"
+                                                    data-bs-toggle="dropdown"></i>
+                                                <ul class="dropdown-menu shadow border-0" id="catFilterDropdown">
+                                                    <li><a class="dropdown-item active" href="#"
+                                                            data-val="ALL">Todas</a></li>
+                                                    <li><a class="dropdown-item" href="#" data-val="TOP">TOP</a></li>
+                                                    <li><a class="dropdown-item" href="#" data-val="NORMAL">NORMAL</a>
+                                                    </li>
+                                                    <li><a class="dropdown-item" href="#" data-val="BOTTOM">BOTTOM</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="globalListBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="user">
+                <div class="row g-3">
+                    <div class="col-12 col-lg-4">
+                        <div class="card p-3">
+                            <label class="form-label fw-bold small text-label-dark">BUSCAR EMPLEADO</label>
+                            <input type="text" id="userSearchInput" list="userList" class="form-control mb-3"
+                                placeholder="Usuario o Nombre">
+                            <datalist id="userList"></datalist>
+
+                            <div id="userStats" class="d-none">
+                                <h4 id="userNameDisplay" class="fw-bold mb-2 text-gxo text-break">Usuario</h4>
+                                <div class="d-flex justify-content-between mb-2 small text-label-dark"><span>Eficiencia
+                                        Media:</span><span class="fw-bold fs-5" id="userEffDisplay">0%</span></div>
+                                <div class="d-flex justify-content-between mb-2 small text-label-dark"><span>Actividad
+                                        Top:</span><span class="fw-bold" id="userMainActDisplay">-</span></div>
+                                <div
+                                    class="d-flex justify-content-between mb-3 small text-label-dark align-items-center">
+                                    <span>Categoría Actual:</span><span id="userWeightedCatDisplay"
+                                        class="badge-gxo bg-light">...</span>
+                                </div>
+                                <div
+                                    class="d-flex justify-content-between mb-3 small text-label-dark align-items-center">
+                                    <span>Tipo Contrato:</span><span id="userTurnoDisplay" class="fw-bold">-</span>
+                                </div>
+                                <hr style="border-color: var(--border-color);">
+                                <div class="row g-2 mb-2">
+                                    <div class="col-6"><label class="small text-label-dark">Operativa</label><select
+                                            id="userActFilter" class="form-select form-select-sm">
+                                            <option value="ALL">Todas</option>
+                                        </select></div>
+                                    <div class="col-6"><label class="small text-label-dark">Tiempo</label><select
+                                            id="userTimeFilter" class="form-select form-select-sm">
+                                            <option value="ALL">Histórico</option>
+                                            <option value="last7">Últimos 7 Días</option>
+                                            <option value="month">Por Mes</option>
+                                            <option value="day">Por Día</option>
+                                            <option value="calendar">Calendario</option>
+                                        </select></div>
+                                </div>
+                                <div id="userSubFilterContainer" class="mb-3 d-none"><label id="userSubFilterLabel"
+                                        class="small text-label-dark text-gxo fw-bold">Seleccionar:</label><select
+                                        id="userSubFilter" class="form-select form-select-sm"></select></div>
+                                <div class="text-center mt-2"><button class="btn btn-sm btn-outline-danger w-100"
+                                        id="btnResetUser">Limpiar Filtros</button></div>
+                            </div>
+                        </div>
+                        <div class="card p-3 d-none" id="userTrendCard">
+                            <h6 class="card-title small text-label-dark text-uppercase mb-3">Tendencia</h6>
+                            <div style="position: relative; height: 200px; width: 100%;"><canvas
+                                    id="userTrendChart"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-8">
+                        <div class="card p-0 overflow-hidden h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center bg-transparent">
+                                <span class="small fw-bold text-uppercase text-label-dark">Registro Jornadas</span>
+                                <div>
+                                    <button id="btnExportUserXLSX"
+                                        class="btn btn-sm btn-outline-success rounded-pill me-2"><i
+                                            class="bi bi-file-earmark-excel"></i> .xlsx</button>
+                                    <span class="badge bg-secondary rounded-pill" id="userRecordCount">0</span>
+                                </div>
+                            </div>
+                            <div class="table-responsive" style="max-height: 650px;">
+                                <table class="table table-hover align-middle mb-0 text-center small">
+                                    <thead class="sticky-top">
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Actividad</th>
+                                            <th>Real</th>
+                                            <th>Target</th>
+                                            <th>Eficiencia</th>
+                                            <th>Categoría</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="userTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="bulk">
+                <div class="row g-3">
+                    <div class="col-12 col-lg-2">
+                        <div class="card p-3">
+                            <label class="form-label fw-bold text-label-dark">Pegar Lista (IDs)</label>
+                            <textarea id="bulkInput" class="form-control mb-3" rows="12"
+                                placeholder="Pegar columna de Excel..."></textarea>
+                            <button class="btn btn-danger w-100 mb-2" id="btnProcessBulk">Procesar Lista</button>
+                            <div class="text-center"><span class="btn-link-reset"
+                                    onclick="document.getElementById('bulkInput').value=''; document.getElementById('bulkTableBody').innerHTML='';">Limpiar
+                                    Filtro</span></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-10">
+                        <div class="card p-0">
+                            <div
+                                class="card-header bg-transparent text-label-dark d-flex justify-content-between align-items-center">
+                                <span>Resultados Comparativos</span>
+                                <button id="btnExportBulkXLSX" class="btn btn-sm btn-outline-success rounded-pill"><i
+                                        class="bi bi-file-earmark-excel"></i> .xlsx</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuario / ID</th>
+                                            <th>Turno</th>
+                                            <th>Tipo</th>
+                                            <th>Operativa Principal</th>
+                                            <th class="text-center">Productividad Promedio</th>
+                                            <th class="text-center">Eficiencia Global</th>
+                                            <th class="text-center">Clasificación</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bulkTableBody" style="cursor: pointer;"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <!-- Scripts de la Aplicación -->
+    <script src="js/login.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+
+</html>

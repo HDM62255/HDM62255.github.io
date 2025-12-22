@@ -1,0 +1,670 @@
+/* ESTILOS IDÉNTICOS A V10.0 (Estables) */
+:root {
+    --gxo-red: #ff3a00;
+    --gxo-dark: #2c3e50;
+    --bg-body: #f8f9fa;
+    --bg-card: #ffffff;
+    --text-main: #000000;
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    --cat-top: #a5d6a7;
+    --cat-normal: #ffe082;
+    --cat-bottom: #ef9a9a;
+    --chart-bar: #ffab91;
+    --chart-target: #37474f;
+    --chart-trend-stroke: #ff3a00;
+    --chart-fill-user: rgba(255, 58, 0, 0.1);
+}
+
+body.dark-mode {
+    --bg-body: #121212;
+    --bg-card: #1e1e1e;
+    --text-main: #e0e0e0;
+    --text-muted: #ced4da;
+    --border-color: #333333;
+    --chart-target: #ffffff;
+    --chart-trend-stroke: #ff3a00;
+}
+
+/* CORRECCIÓN VISIBILIDAD MODO OSCURO */
+body.dark-mode .text-muted {
+    color: #adb5bd !important;
+}
+
+/* Hace visible los IDs en la tabla */
+body.dark-mode .navbar-text-subtitle {
+    color: #ffffff !important;
+}
+
+/* Hace visible el título */
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    overflow-x: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.navbar {
+    background: var(--bg-card);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.8rem 1rem;
+}
+
+.navbar-brand img {
+    height: 40px;
+    transition: height 0.3s;
+}
+
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.kpi-value {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: var(--text-main);
+    word-break: break-all;
+    line-height: 1.2;
+}
+
+body.dark-mode .kpi-value {
+    color: #ff3a00;
+}
+
+.kpi-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+.nav-tabs {
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
+
+#mainTab {
+    overflow: hidden;
+    overflow-y: hidden;
+    height: auto;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-tabs .nav-link {
+    color: var(--text-muted);
+    border: none;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--gxo-red) !important;
+    border-bottom: 3px solid var(--gxo-red);
+    background: transparent;
+}
+
+/* Form Styles Clonados */
+.form-control,
+.form-select {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 8px;
+    padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+    min-height: 31px;
+}
+
+.choices__inner {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 8px;
+    min-height: 31px;
+    padding: 2px 10px;
+    display: flex;
+    align-items: center;
+}
+
+.choices__input {
+    color: var(--text-main);
+}
+
+/* FIX: Input de búsqueda en Choices (Actividades) */
+.choices__input.choices__input--cloned {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.choices__input.choices__input--cloned::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 1;
+    /* Firefox fix */
+}
+
+/* FIX: Visibilidad Input en Light Mode */
+body:not(.dark-mode) .choices__input.choices__input--cloned {
+    color: #000000 !important;
+}
+
+body:not(.dark-mode) .choices__input.choices__input--cloned::placeholder {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+/* FIX: Ocultar placeholder cuando hay selección múltiple */
+.choices__list--multiple .choices__item~.choices__input.choices__input--cloned::placeholder {
+    color: transparent !important;
+    opacity: 0 !important;
+}
+
+/* FIX: Z-Index Dropdown */
+.choices__list.choices__list--dropdown {
+    z-index: 2000 !important;
+    /* Supera sticky-top de th (1020) */
+    word-break: break-all;
+}
+
+.choices {
+    overflow: visible !important;
+}
+
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text-main);
+    white-space: nowrap;
+}
+
+/* Optimización Columna Usuario */
+.user-cell-truncate {
+    max-width: 240px;
+    /* Ampliado para cubrir "Usuario, Nombre..." */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+#globalListContainer .table-responsive {
+    min-height: 350px;
+    overflow-y: auto;
+}
+
+/* Ajuste de anchos fijos para columnas críticas */
+#globalListContainer th:nth-child(1) {
+    width: 22%;
+}
+
+/* Usuario */
+#globalListContainer th:nth-child(2) {
+    width: 8%;
+}
+
+/* ID */
+#globalListContainer th:nth-child(3) {
+    width: 8%;
+}
+
+/* Turno (Shift) */
+#globalListContainer th:nth-child(4) {
+    width: 8%;
+}
+
+/* Tipo (Contract) */
+/* El resto auto */
+
+
+/* FIX: Semantic Hover */
+.table-hover>tbody>tr:hover {
+    --bs-table-accent-bg: transparent !important;
+    /* Desactiva hover default bootstrap */
+}
+
+/* Hover Semántico basado en data-cat */
+/* Hover Semántico - LIGHT MODE (Fondo Pastel, Texto Negro) */
+body:not(.dark-mode) tr[data-cat="TOP"]:hover>* {
+    background-color: var(--cat-top) !important;
+    color: #000000 !important;
+}
+
+body:not(.dark-mode) tr[data-cat="NORMAL"]:hover>* {
+    background-color: var(--cat-normal) !important;
+    color: #000000 !important;
+}
+
+body:not(.dark-mode) tr[data-cat="BOTTOM"]:hover>* {
+    background-color: var(--cat-bottom) !important;
+    color: #000000 !important;
+}
+
+/* Force black text elements in Light Mode hover */
+body:not(.dark-mode) tr[data-cat]:hover .text-muted,
+body:not(.dark-mode) tr[data-cat]:hover .eff-val,
+body:not(.dark-mode) tr[data-cat]:hover .badge-gxo {
+    color: #000000 !important;
+}
+
+
+/* Hover Semántico - DARK MODE (Fondo Dark, Texto Color Categ, Badge Invertido) */
+/* TOP */
+body.dark-mode tr[data-cat="TOP"]:hover>* {
+    background-color: transparent !important;
+    /* O mantener dark suave */
+    color: var(--cat-top) !important;
+}
+
+body.dark-mode tr[data-cat="TOP"]:hover .text-muted,
+body.dark-mode tr[data-cat="TOP"]:hover .eff-val {
+    color: var(--cat-top) !important;
+}
+
+body.dark-mode tr[data-cat="TOP"]:hover .badge-gxo {
+    background-color: #ffffff !important;
+    color: var(--cat-top) !important;
+}
+
+/* NORMAL */
+body.dark-mode tr[data-cat="NORMAL"]:hover>* {
+    background-color: transparent !important;
+    color: var(--cat-normal) !important;
+}
+
+body.dark-mode tr[data-cat="NORMAL"]:hover .text-muted,
+body.dark-mode tr[data-cat="NORMAL"]:hover .eff-val {
+    color: var(--cat-normal) !important;
+}
+
+body.dark-mode tr[data-cat="NORMAL"]:hover .badge-gxo {
+    background-color: #ffffff !important;
+    color: var(--cat-normal) !important;
+}
+
+/* BOTTOM */
+body.dark-mode tr[data-cat="BOTTOM"]:hover>* {
+    background-color: transparent !important;
+    color: var(--cat-bottom) !important;
+}
+
+body.dark-mode tr[data-cat="BOTTOM"]:hover .text-muted,
+body.dark-mode tr[data-cat="BOTTOM"]:hover .eff-val {
+    color: var(--cat-bottom) !important;
+}
+
+body.dark-mode tr[data-cat="BOTTOM"]:hover .badge-gxo {
+    background-color: #ffffff !important;
+    color: var(--cat-bottom) !important;
+}
+
+/* Asegurar que el fondo se aplica sobre las celdas */
+tr[data-cat]:hover td {
+    background-color: inherit !important;
+    color: inherit !important;
+}
+
+.table thead th {
+    background-color: var(--bg-body);
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border-color);
+}
+
+body.dark-mode .table thead th {
+    color: #fff;
+    background-color: #2d2d2d;
+}
+
+.table tbody td {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.text-top {
+    color: #1b5e20;
+}
+
+body.dark-mode .text-top {
+    color: #69f0ae;
+}
+
+.text-normal {
+    color: #f57f17;
+}
+
+body.dark-mode .text-normal {
+    color: #ffe082;
+}
+
+.text-bottom {
+    color: #b71c1c;
+}
+
+body.dark-mode .text-bottom {
+    color: #ff8a80;
+}
+
+.eff-val {
+    font-weight: 900;
+    font-size: 1.1em;
+}
+
+.badge-gxo {
+    border-radius: 50rem;
+    padding: 0.4em 1em;
+    font-weight: 800;
+    font-size: 0.75em;
+    color: #212529 !important;
+    min-width: 80px;
+    display: inline-block;
+    text-align: center;
+}
+
+.bg-top {
+    background-color: var(--cat-top) !important;
+}
+
+.bg-normal {
+    background-color: var(--cat-normal) !important;
+}
+
+.bg-bottom {
+    background-color: var(--cat-bottom) !important;
+}
+
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+body.dark-mode #loader {
+    background: rgba(0, 0, 0, 0.95);
+}
+
+.btn-lantern {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.btn-lantern:hover,
+.btn-lantern.active {
+    background-color: var(--gxo-red);
+    color: white;
+    border-color: var(--gxo-red);
+    box-shadow: 0 0 15px var(--gxo-red);
+}
+
+.text-gxo {
+    color: var(--gxo-red) !important;
+}
+
+.text-label-dark {
+    color: var(--text-muted);
+}
+
+body.dark-mode .text-label-dark {
+    color: #e0e0e0;
+}
+
+.btn-link-reset {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.btn-link-reset:hover {
+    color: var(--gxo-red);
+    text-decoration: underline;
+}
+
+.btn-xs-custom {
+    padding: 0.1rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    background-color: var(--border-color);
+    color: var(--text-main);
+    border: none;
+}
+
+.btn-xs-custom:hover {
+    background-color: var(--gxo-red);
+    color: white;
+}
+
+/* Botones de Acción (Listado, Gráfica) - Unificados */
+.btn-action {
+    background-color: var(--gxo-red);
+    color: white;
+    border: none;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.btn-action:hover {
+    background-color: #d10510;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón Limpiar - Blanco */
+.btn-clean {
+    background-color: #ffffff;
+    color: #444;
+    border: 1px solid var(--border-color);
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.btn-clean:hover {
+    background-color: #f0f0f0;
+    color: var(--gxo-red);
+    border-color: var(--gxo-red);
+}
+
+body.dark-mode .btn-clean {
+    background-color: #2c3e50;
+    color: #fff;
+    border-color: #444;
+}
+
+body.dark-mode .btn-clean:hover {
+    background-color: #34495e;
+    border-color: var(--gxo-red);
+}
+
+/* Status de carga automática */
+#autoLoadStatus {
+    font-size: 0.75rem;
+    margin-right: 10px;
+    color: var(--text-muted);
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.5rem 1rem;
+    }
+
+    .navbar-brand img {
+        height: 32px;
+    }
+
+    .navbar-text-subtitle {
+        display: none !important;
+    }
+
+    #csvInput {
+        width: 130px;
+        font-size: 0.75rem;
+    }
+
+    .container-fluid {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .kpi-value {
+        font-size: 1.75rem;
+    }
+
+    .kpi-label {
+        font-size: 0.75rem;
+    }
+
+    canvas {
+        max-height: 200px;
+    }
+}
+
+/* FIX: Search & Bulk Inputs - Mode Specific Colors */
+/* DARK MODE: White Text (Blur), Black Text + White BG (Focus) */
+body.dark-mode #userSearchInput,
+body.dark-mode #bulkInput {
+    color: #ffffff !important;
+    background-color: transparent !important;
+    transition: all 0.3s;
+}
+
+body.dark-mode #userSearchInput::placeholder,
+body.dark-mode #bulkInput::placeholder {
+    color: #ffffff !important;
+    opacity: 1;
+}
+
+body.dark-mode #userSearchInput:focus,
+body.dark-mode #bulkInput:focus {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+body.dark-mode #userSearchInput:focus::placeholder,
+body.dark-mode #bulkInput:focus::placeholder {
+    color: #000000 !important;
+    opacity: 0.6;
+}
+
+/* LIGHT MODE: Always Black Text */
+body:not(.dark-mode) #userSearchInput,
+body:not(.dark-mode) #bulkInput {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da !important;
+}
+
+body:not(.dark-mode) #userSearchInput::placeholder,
+body:not(.dark-mode) #bulkInput::placeholder {
+    color: #6c757d !important;
+    opacity: 1;
+}
+
+/* =========================================
+   LOGIN SCREEN STYLES
+   ========================================= */
+
+#login-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-body);
+    z-index: 10001;
+    /* Above loader */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    text-align: center;
+    /* Card styles inherited but reinforced */
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.login-logo {
+    height: 50px;
+    margin-bottom: 0.5rem;
+}
+
+.login-title {
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: var(--text-main);
+}
+
+.login-error-msg {
+    color: #dc3545;
+    font-size: 0.875rem;
+    min-height: 20px;
+    margin-top: 5px;
+}
+
+/* Shake Animation */
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    50% {
+        transform: translateX(5px);
+    }
+
+    75% {
+        transform: translateX(-5px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.shake {
+    animation: shake 0.4s ease-in-out;
+}
