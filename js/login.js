@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Credentials
     const USERS = {
         'admin': '51423',
-        'Jotin': 'Jotin2403'
+        'Jotin': 'Jotin2403',
+        'Juli': 'Jul1'
     };
 
     // 1. Check Session

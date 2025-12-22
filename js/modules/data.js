@@ -69,6 +69,22 @@ function processRawData(data) {
         const monthLabel = `${monthShort} ${yearShort}`;
         const monthSortId = jsDate.getFullYear() * 100 + jsDate.getMonth();
 
+        // DEBUG: Mostrar Headers (Re-activado para diagnostico final)
+        if (appData.length === 0) {
+            const keys = Object.keys(row).join(" | ");
+            const debugEl = document.getElementById('loader-subtext');
+            if (debugEl) debugEl.innerText = "COLS: " + keys.substring(0, 50) + "...";
+        }
+
+        // Detección robusta de la columna PROD.OBJ (Incluso con punto final)
+        const targetKey = Object.keys(row).find(k => {
+            const cleanKey = k.trim().toUpperCase();
+            return cleanKey === 'PROD.OBJ.' ||
+                cleanKey === 'PROD. OBJ.' ||
+                cleanKey === 'PROD.OBJ' ||
+                cleanKey === 'OBJETIVO';
+        });
+
         return {
             id: row['Usuario'], name: row['Nombre'],
             date: jsDate, ts: jsDate.getTime(), dateStr: row['Fecha'],
@@ -81,9 +97,9 @@ function processRawData(data) {
             shift: row['Tipo_Turno'],       // Turno Real (Mañana, Tarde...)
             contractType: row['Turno'],     // Tipo Contrato (Empresa, ETT...)
             currentStatus: row['Estado actual'], // Estado del empleado
-            targetObj: parseNum(row['PROD.OBJ']) // INGESTA: Nuevo Objetivo Dinámico
+            targetObj: targetKey ? parseNum(row[targetKey]) : 0 // INGESTA: Objetivo detectado
         };
-    }).filter(d => d.activity && d.id && ["TOP", "NORMAL", "BOTTOM"].includes(d.category.toUpperCase().trim()));
+    }).filter(d => d.activity && d.id);
 
     latestDateInDB = new Date(maxTs);
 

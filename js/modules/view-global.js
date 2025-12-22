@@ -233,9 +233,13 @@ export function runGlobalAnalysis() {
 function updateGlobalKPIs() {
     const totalVol = filteredData.reduce((acc, curr) => acc + curr.production, 0);
     const totalHours = filteredData.reduce((acc, curr) => acc + curr.hours, 0);
+
+    // Para eficiencia y donut, SÍ filtramos por categorias validas
+    const validData = filteredData.filter(d => ["TOP", "NORMAL", "BOTTOM"].includes(d.category.toUpperCase().trim()));
+
     let sumEff = 0; let countEff = 0;
     const cats = { TOP: 0, NORMAL: 0, BOTTOM: 0 };
-    filteredData.forEach(d => {
+    validData.forEach(d => {
         const t = TARGETS[d.activity] || 0;
         let eff = t > 0 ? (d.productivity / t) * 100 : 0;
         if (t > 0) { sumEff += eff; countEff++; }
@@ -262,7 +266,11 @@ function renderGlobalCharts(activities) {
 
     activities.forEach(act => {
         if (!TARGETS[act]) return;
-        const actData = filteredData.filter(d => d.activity === act);
+        // FIX: Filtrar solo categorias validas para las gráficas
+        const actData = filteredData.filter(d =>
+            d.activity === act &&
+            ["TOP", "NORMAL", "BOTTOM"].includes(d.category.toUpperCase().trim())
+        );
         if (actData.length === 0) return;
         const groups = {};
         actData.forEach(d => {
@@ -283,6 +291,9 @@ function renderGlobalListAsync(filterLabel) {
     const tbody = document.getElementById('globalListBody'); tbody.innerHTML = '';
     const userMap = new Map();
     filteredData.forEach(d => {
+        // FIX: Filtrar solo categorias validas para la lista
+        if (!["TOP", "NORMAL", "BOTTOM"].includes(d.category.toUpperCase().trim())) return;
+
         if (!userMap.has(d.id)) { userMap.set(d.id, { id: d.id, name: d.name, sumProd: 0, countProd: 0, sumTarget: 0, countTarget: 0, cats: { TOP: 0, NORMAL: 0, BOTTOM: 0 }, shiftCounts: {}, contractCounts: {} }); }
         const u = userMap.get(d.id);
         u.sumProd += d.productivity; u.countProd++;

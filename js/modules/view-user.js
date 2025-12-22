@@ -195,9 +195,19 @@ export function filterUserTable() {
     // FIX: Filtrar registros con Prod. Real (Productivity) = 0
     data = data.filter(d => d.productivity > 0);
 
-    let sumEff = 0; let countEff = 0; const actCounts = {};
-    data.forEach(d => { const t = TARGETS[d.activity] || 0; if (t > 0) { sumEff += (d.productivity / t) * 100; countEff++; } actCounts[d.activity] = (actCounts[d.activity] || 0) + 1; });
-    const avgEff = countEff > 0 ? (sumEff / countEff).toFixed(1) : 0;
+    let sumProd = 0;
+    let sumTarget = 0;
+    const actCounts = {};
+
+    data.forEach(d => {
+        // Accumulate for dynamic Efficiency
+        sumProd += d.productivity;
+        sumTarget += (d.targetObj || 0);
+
+        actCounts[d.activity] = (actCounts[d.activity] || 0) + 1;
+    });
+
+    const avgEff = sumTarget > 0 ? ((sumProd / sumTarget) * 100).toFixed(1) : 0;
     const mainAct = Object.keys(actCounts).length ? Object.keys(actCounts).reduce((a, b) => actCounts[a] > actCounts[b] ? a : b) : "-";
     document.getElementById('userEffDisplay').innerText = avgEff + "%"; document.getElementById('userMainActDisplay').innerText = mainAct;
     calculateUserWeightedCategory(data);

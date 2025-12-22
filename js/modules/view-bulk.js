@@ -15,13 +15,20 @@ export function processBulk() {
     tokens.forEach(token => {
         const uRows = appData.filter(d => d.id === token || d.name === token);
         if (uRows.length === 0) return;
-        let sumEff = 0; let cntEff = 0; const counts = {};
-        const shiftCounts = {}; const contractCounts = {}; const statusCounts = {};
+
+        let sumProd = 0;
+        let sumTarget = 0;
+        const counts = {};
+        const shiftCounts = {};
+        const contractCounts = {};
+        const statusCounts = {};
 
         uRows.forEach(d => {
             counts[d.activity] = (counts[d.activity] || 0) + 1;
-            const t = TARGETS[d.activity] || 0;
-            if (t > 0) { sumEff += (d.productivity / t) * 100; cntEff++; }
+
+            // Accumulate Production and Target
+            sumProd += d.productivity;
+            sumTarget += (d.targetObj || 0);
 
             // Accumulate Shift and Turno(Contract)
             const sVal = d.shift || "N/A";
@@ -64,7 +71,10 @@ export function processBulk() {
         });
         const avgProdMain = cntProdMain > 0 ? (sumProdMain / cntProdMain) : 0;
 
-        results.push({ id: uRows[0].id, name: uRows[0].name, main: mainActivity, prodAvg: avgProdMain, eff: cntEff > 0 ? (sumEff / cntEff) : 0, turno: modeS, tipo: modeC, estado: modeSt });
+        // Dynamic Efficiency Calculation
+        const effGlobal = sumTarget > 0 ? (sumProd / sumTarget) * 100 : 0;
+
+        results.push({ id: uRows[0].id, name: uRows[0].name, main: mainActivity, prodAvg: avgProdMain, eff: effGlobal, turno: modeS, tipo: modeC, estado: modeSt });
     });
 
     // Custom Event dispatch to nav to user
