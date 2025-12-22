@@ -195,6 +195,9 @@ export function filterUserTable() {
     // FIX: Filtrar registros con Prod. Real (Productivity) = 0
     data = data.filter(d => d.productivity > 0);
 
+    // FIX: Filtrar solo categorias validas (Normal, Top, Bottom)
+    data = data.filter(d => ["TOP", "NORMAL", "BOTTOM"].includes(d.category.toUpperCase().trim()));
+
     let sumProd = 0;
     let sumTarget = 0;
     const actCounts = {};

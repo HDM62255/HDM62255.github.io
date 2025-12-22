@@ -13,7 +13,7 @@ export function processBulk() {
     const tbody = document.getElementById('bulkTableBody'); tbody.innerHTML = '';
     const results = [];
     tokens.forEach(token => {
-        const uRows = appData.filter(d => d.id === token || d.name === token);
+        const uRows = appData.filter(d => (d.id === token || d.name === token) && ["TOP", "NORMAL", "BOTTOM"].includes(d.category.toUpperCase().trim()));
         if (uRows.length === 0) return;
 
         let sumProd = 0;
