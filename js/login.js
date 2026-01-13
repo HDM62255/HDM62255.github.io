@@ -14,7 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const USERS = {
         'admin': '51423',
         'Jotin': 'Jotin2403',
-        'Juli': 'Jul1'
+        'Juli': 'Jul1',
+        'oñoro': '12345',
+        'mcasais': '12345',
+        'sequera': '12345',
+        'GXO': '12345'
     };
 
     // 1. Check Session
