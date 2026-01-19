@@ -173,13 +173,25 @@ function updateUserSubFilters() {
 
 /**
  * Calcula la categoría ponderada del usuario.
+ * ACEPTA errorCount para sobrescribir si errors > validos.
  */
-function calculateUserWeightedCategory(data) {
+function calculateUserWeightedCategory(data, errorCount = 0) {
+    const validCount = data.length;
+    const badge = document.getElementById('userWeightedCatDisplay');
+
+    // REGLA: Si hay más errores que datos válidos -> ERROR FICHAJE
+    if (errorCount > validCount) {
+        badge.className = `badge-gxo bg-danger`; // O la clase de alerta que prefieras
+        badge.innerText = `ERROR FICHAJE (${errorCount})`;
+        return;
+    }
+
+    // Lógica Original
     const counts = { TOP: 0, NORMAL: 0, BOTTOM: 0 };
     data.forEach(d => { const t = TARGETS[d.activity] || 0; const eff = t > 0 ? (d.productivity / t) * 100 : 0; const st = getColorStatus(eff, d.category); if (st.label === "TOP") counts.TOP++; else if (st.label === "BOTTOM") counts.BOTTOM++; else counts.NORMAL++; });
     const sTop = counts.TOP * 0.3; const sNorm = counts.NORMAL * 0.3; const sBottom = counts.BOTTOM * 0.4;
     let label = "NORMAL"; if (sBottom >= sTop && sBottom >= sNorm) label = "BOTTOM"; else if (sTop >= sNorm && sTop > sBottom) label = "TOP";
-    const style = getColorStatus(0, label); const badge = document.getElementById('userWeightedCatDisplay');
+    const style = getColorStatus(0, label);
     badge.className = `badge-gxo ${style.badgeClass}`; badge.innerText = label;
 }
 
@@ -191,6 +203,18 @@ export function filterUserTable() {
     else if (timeFilter === 'month' && subFilter) { data = data.filter(d => d.monthLabel === subFilter); }
     else if (timeFilter === 'day' && subFilter) { data = data.filter(d => d.dateStr === subFilter); }
     else if (timeFilter === 'calendar') { data = data.filter(d => userCustomDates.includes(d.dateStr)); }
+
+    // --- LÓGICA DE DÍAS DE ERROR (Solicitado) ---
+    // Contamos registros "ERROR/REVISION" antes de filtrar "Prod > 0" y "Categorias validas"
+    // PERO respetando el filtro de tiempo/actividad ya aplicado en 'data' hasta aquí.
+    let errorCount = 0;
+    data.forEach(d => {
+        const cat = d.category ? d.category.toUpperCase().trim() : "";
+        // Ajusta esta condición si el string exacto difiere, e.g. "ERROR", "REVISION", etc.
+        if (cat.includes("ERROR") || cat.includes("REVISION")) {
+            errorCount++;
+        }
+    });
 
     // FIX: Filtrar registros con Prod. Real (Productivity) = 0
     data = data.filter(d => d.productivity > 0);
@@ -213,7 +237,9 @@ export function filterUserTable() {
     const avgEff = sumTarget > 0 ? ((sumProd / sumTarget) * 100).toFixed(1) : 0;
     const mainAct = Object.keys(actCounts).length ? Object.keys(actCounts).reduce((a, b) => actCounts[a] > actCounts[b] ? a : b) : "-";
     document.getElementById('userEffDisplay').innerText = avgEff + "%"; document.getElementById('userMainActDisplay').innerText = mainAct;
-    calculateUserWeightedCategory(data);
+
+    // Pasamos errorCount a la función de cálculo
+    calculateUserWeightedCategory(data, errorCount);
     const tbody = document.getElementById('userTableBody'); tbody.innerHTML = '';
     data.sort((a, b) => b.ts - a.ts);
     currentFilteredUserRows = data; // Cache for export
