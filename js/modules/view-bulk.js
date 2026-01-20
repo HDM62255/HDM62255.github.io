@@ -102,16 +102,42 @@ export function processBulk() {
         uRows.forEach(d => { if (d.activity === mainActivity) { sumProdMain += d.productivity; cntProdMain++; } });
         const avgProdMain = cntProdMain > 0 ? (sumProdMain / cntProdMain) : 0;
 
-        // Dynamic Efficiency Calculation
+        // Dynamic Efficiency Calculation (Solo Visual)
         const effGlobal = sumTarget > 0 ? (sumProd / sumTarget) * 100 : 0;
 
-        // --- LÓGICA DE CATEGORÍA ---
-        let style = getColorStatus(effGlobal, "");
-        let finalLabel = style.label;
+        // --- N U E V A   L Ó G I C A   D E   C A T E G O R Í A   P O R   C O N T E O ---
+        // 1. Contar días válidos por categoría (TOP, NORMAL, BOTTOM)
+        const dayCounts = { TOP: 0, NORMAL: 0, BOTTOM: 0 };
+        uRows.forEach(d => {
+            let dayCat = "NORMAL";
+            // Si el CSV ya trae categoria explicita valida, usala
+            if (d.category && ["TOP", "NORMAL", "BOTTOM"].includes(d.category.toUpperCase().trim())) {
+                dayCat = d.category.toUpperCase().trim();
+            } else {
+                // Fallback cálculo manual si faltara
+                const t = d.targetObj || 0;
+                const e = t > 0 ? (d.productivity / t) * 100 : 0;
+                const s = getColorStatus(e, "");
+                dayCat = s.label;
+            }
+            if (dayCounts[dayCat] !== undefined) dayCounts[dayCat]++;
+            else dayCounts["NORMAL"]++;
+        });
+
+        // 2. Determinar Mayor (Mode)
+        let standardLabel = "NORMAL";
+        let maxCount = -1;
+        // Prioridad simplificada: el que tenga más días gana
+        if (dayCounts.TOP > maxCount) { maxCount = dayCounts.TOP; standardLabel = "TOP"; }
+        if (dayCounts.NORMAL > maxCount) { maxCount = dayCounts.NORMAL; standardLabel = "NORMAL"; }
+        if (dayCounts.BOTTOM > maxCount) { maxCount = dayCounts.BOTTOM; standardLabel = "BOTTOM"; }
+
+        // 3. Comparar con Errores: Valid <= Error -> Error
+        let finalLabel = standardLabel;
         let isErrorLabel = false;
 
-        const validCount = uRows.length;
-        if (errorCount > validCount) {
+        const validTotal = uRows.length; // Suma de Top+Normal+Bottom
+        if (validTotal <= errorCount) {
             finalLabel = `ERROR FICHAJE (${errorCount})`;
             isErrorLabel = true;
         }
