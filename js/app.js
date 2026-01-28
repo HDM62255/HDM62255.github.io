@@ -2,6 +2,7 @@ import { initDataHandling } from './modules/data.js';
 import { initGlobalView, runGlobalAnalysis } from './modules/view-global.js';
 import { initUserView, filterUserTable } from './modules/view-user.js';
 import { initBulkView } from './modules/view-bulk.js';
+import { initComparativesView, updateComparativesCharts } from './modules/view-comparatives.js';
 
 let isDarkMode = true;
 document.body.classList.add('dark-mode');
@@ -12,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initGlobalView();
     initUserView();
     initBulkView();
+    initComparativesView();
 
     // Inicializar Tooltips de Bootstrap
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -41,6 +43,7 @@ function toggleDarkMode() {
 
     // Refrescar vistas para aplicar nuevos colores en gráficos
     runGlobalAnalysis();
+    updateComparativesCharts();
 
     if (!document.getElementById('userStats').classList.contains('d-none')) {
         filterUserTable();

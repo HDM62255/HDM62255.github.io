@@ -79,6 +79,8 @@
                     data-bs-target="#user">Detalle Usuario</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#bulk">Buscador
                     Masivo</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                    data-bs-target="#comparativas">Comparativas</button></li>
         </ul>
 
         <div class="tab-content">
@@ -357,6 +359,194 @@
                     </div>
                 </div>
             </div>
+
+            <div class="tab-pane fade" id="comparativas">
+                <!-- Header Controls -->
+                <div
+                    class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary gap-3">
+                    <div>
+                        <h1 class="h2 fw-bold mb-1 text-adaptive-title">Comparativas de Productividad</h1>
+                        <p class="text-adaptive-title-50 small mb-0">Analisis detallado por tipo de zona, operativa,
+                            prenda y turno</p>
+                    </div>
+
+                    <!-- Date Filters -->
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="input-group input-group-sm">
+                            <span
+                                class="input-group-text bg-transparent border-secondary text-adaptive-subtitle">Desde</span>
+                            <input type="text" id="dateStart" readonly
+                                class="form-control bg-transparent text-adaptive-title border-secondary"
+                                style="cursor: pointer;" placeholder="DD/MM/YYYY">
+                        </div>
+                        <div class="input-group input-group-sm">
+                            <span
+                                class="input-group-text bg-transparent border-secondary text-adaptive-subtitle">Hasta</span>
+                            <input type="text" id="dateEnd" readonly
+                                class="form-control bg-transparent text-adaptive-title border-secondary"
+                                style="cursor: pointer;" placeholder="DD/MM/YYYY">
+                        </div>
+                        <button id="applyDates" class="btn btn-sm btn-action ms-2">Filtrar</button>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button id="exportPdf" class="btn btn-outline-danger" title="Exportar a PDF">
+                            <i class="bi bi-file-earmark-pdf-fill me-2"></i>PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingMessage" class="d-flex justify-content-center align-items-center py-5">
+                    <div class="spinner-border text-primary me-3" role="status"></div>
+                    <span class="text-adaptive-title-50 fw-bold">Cargando datos comparativos...</span>
+                </div>
+
+                <!-- Content (Hidden until loaded) -->
+                <div id="comparativasContent" class="d-none">
+
+                    <!-- Slide 1: SUELO vs AGV -->
+                    <section class="mb-5">
+                        <div class="card p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h3 class="card-title fw-bold mb-1 text-adaptive-title">Comparativa SUELO vs AGV
+                                    </h3>
+                                    <p class="text-adaptive-title-50 small mb-0">Volumen y productividad por tipo de
+                                        zona y operativa</p>
+                                </div>
+                            </div>
+
+                            <div id="summaryCards" class="row g-3 mb-4">
+                                <!-- Summary Cards injected via JS -->
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-12 col-lg-6">
+                                    <div class="card h-100 p-3 text-adaptive-title">
+                                        <h5
+                                            class="text-center text-adaptive-title-50 small fw-bold text-uppercase mb-3">
+                                            Volumen por Tipo de Zona</h5>
+                                        <div style="height: 300px; position: relative;">
+                                            <canvas id="chartVolumenTipo"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="card h-100 p-3 text-adaptive-title">
+                                        <h5
+                                            class="text-center text-adaptive-title-50 small fw-bold text-uppercase mb-3">
+                                            Productividad por Tipo de Zona</h5>
+                                        <div style="height: 300px; position: relative;">
+                                            <canvas id="chartProdTipo"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 2: Por Zona -->
+                    <section class="mb-5">
+                        <div class="card p-4">
+                            <div class="mb-4">
+                                <h3 class="card-title fw-bold mb-1 text-adaptive-title">Productividad por Zona</h3>
+                                <p class="text-adaptive-title-50 small mb-0">Comparativa detallada de cada zona por
+                                    operativa</p>
+                            </div>
+                            <div class="row g-4 justify-content-center">
+                                <div class="col-12 col-lg-10 col-xl-8">
+                                    <div class="card h-100 p-3 text-adaptive-title">
+                                        <h5
+                                            class="text-center text-adaptive-subtitle small fw-bold text-uppercase mb-3">
+                                            Zonas SUELO (PICKING / RBS)</h5>
+                                        <div style="height: 350px; position: relative;">
+                                            <canvas id="chartZonaSuelo"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-10 col-xl-8">
+                                    <div class="card h-100 p-3 text-adaptive-title">
+                                        <h5
+                                            class="text-center text-adaptive-subtitle small fw-bold text-uppercase mb-3">
+                                            Zonas AGV (PICKING AUTO)</h5>
+                                        <div style="height: 350px; position: relative;">
+                                            <canvas id="chartZonaAgv"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 3: Por Prenda -->
+                    <section class="mb-5">
+                        <div class="card p-4">
+                            <div class="mb-4">
+                                <h3 class="card-title fw-bold mb-1 text-adaptive-title">Productividad por Prenda</h3>
+                                <p class="text-adaptive-title-50 small mb-0">Rendimiento segun tipo de prenda por
+                                    operativa</p>
+                            </div>
+                            <div class="row g-4 justify-content-center">
+                                <div class="col-12 col-lg-10 col-xl-8">
+                                    <div class="card h-100 p-3 text-adaptive-title">
+                                        <h5
+                                            class="text-center text-adaptive-subtitle small fw-bold text-uppercase mb-3">
+                                            Productividad por Prenda y Operativa</h5>
+                                        <div style="height: 350px; position: relative;">
+                                            <canvas id="chartPrenda"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-8 col-xl-6">
+                                    <div class="card h-100 p-3 text-adaptive-title">
+                                        <h5
+                                            class="text-center text-adaptive-subtitle small fw-bold text-uppercase mb-3">
+                                            Volumen por Prenda</h5>
+                                        <div style="height: 400px; position: relative;">
+                                            <canvas id="chartVolumenPrenda"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Slide 4: Por Turno -->
+                    <section class="mb-5">
+                        <div class="card p-4">
+                            <div class="mb-4">
+                                <h3 class="card-title fw-bold mb-1 text-adaptive-title">Productividad por Turno</h3>
+                                <p class="text-adaptive-title-50 small mb-0">Rendimiento por turno (Manana, Tarde,
+                                    Noche)</p>
+                            </div>
+                            <div class="row g-4">
+                                <div class="col-12 col-lg-6">
+                                    <div class="card h-100 p-3 text-adaptive-title">
+                                        <h5
+                                            class="text-center text-adaptive-subtitle small fw-bold text-uppercase mb-3">
+                                            Productividad por Turno y Operativa</h5>
+                                        <div style="height: 300px; position: relative;">
+                                            <canvas id="chartTurno"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <div class="card h-100 p-3 text-adaptive-title">
+                                        <h5
+                                            class="text-center text-adaptive-subtitle small fw-bold text-uppercase mb-3">
+                                            Horas por Turno</h5>
+                                        <div style="height: 300px; position: relative;">
+                                            <canvas id="chartHorasTurno"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
         </div>
     </div>
 
@@ -366,6 +556,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <!-- Scripts de la Aplicación -->
     <script src="js/login.js"></script>

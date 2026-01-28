@@ -13,7 +13,8 @@ export class CalendarWidget {
             onSelect: (dates) => console.log('Selected:', dates),
             initialDates: [],
             isStatic: false, // true for User View (injected), false for Global (overlay)
-            overlayTarget: null // Element to position over if isStatic is false
+            overlayTarget: null, // Element to position over if isStatic is false
+            singleMode: false // New option to force single selection
         }, options);
 
         // Load initial dates
@@ -173,7 +174,7 @@ export class CalendarWidget {
     }
 
     _handleDayClick(e, dateKey, dayNum) {
-        if (e.ctrlKey || e.metaKey) {
+        if (!this.config.singleMode && (e.ctrlKey || e.metaKey)) {
             // Toggle
             if (this.selectedDates.has(dateKey)) {
                 this.selectedDates.delete(dateKey);
@@ -181,15 +182,12 @@ export class CalendarWidget {
                 this.selectedDates.add(dateKey);
             }
             this.lastClickedDate = dateKey;
-        } else if (e.shiftKey && this.lastClickedDate) {
+        } else if (!this.config.singleMode && e.shiftKey && this.lastClickedDate) {
             // Range
             this._selectRange(this.lastClickedDate, dateKey);
         } else {
             // Single select (clears others)
-            // Wait, requirement says "Selection allows... Single, Range, List".
-            // Typically clicking without modifier clears others in a clean UI, OR just toggles.
-            // Let's default to: Click = Select ONLY this (Clear others).
-            // If user wants accumulate, they use Ctrl.
+            // Default behavior or forced by singleMode
             this.selectedDates.clear();
             this.selectedDates.add(dateKey);
             this.lastClickedDate = dateKey;

@@ -36,7 +36,39 @@ body.dark-mode .navbar-text-subtitle {
     color: #ffffff !important;
 }
 
-/* Hace visible el título */
+/* FIX: Makes titles visible in dark mode - High Specificity */
+body.dark-mode .text-adaptive-title,
+body.dark-mode h1.text-adaptive-title,
+body.dark-mode h2.text-adaptive-title,
+body.dark-mode h3.text-adaptive-title,
+body.dark-mode h4.text-adaptive-title,
+body.dark-mode h5.text-adaptive-title,
+body.dark-mode .card-title.text-adaptive-title {
+    color: #ffffff !important;
+}
+
+body.dark-mode .text-adaptive-subtitle,
+body.dark-mode .small.text-adaptive-subtitle {
+    color: #ced4da !important;
+}
+
+body.dark-mode .text-adaptive-title-50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.text-adaptive-title {
+    color: var(--text-main) !important;
+}
+
+/* Light Mode Defaults */
+.text-adaptive-subtitle,
+.small.text-adaptive-subtitle {
+    color: var(--text-muted) !important;
+}
+
+.text-adaptive-title-50 {
+    color: rgba(0, 0, 0, 0.5) !important;
+}
 
 body {
     font-family: 'Inter', sans-serif;
